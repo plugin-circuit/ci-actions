@@ -1,7 +1,7 @@
 # ci-actions
 
 Shared GitHub Actions for Plugin Circuit's C++ CMake projects (the plugin, libplugincircuit, the ports). Modelled on
-tanh-lab/ci-actions. Pin a tag (`@v0.1.1`), not `main`.
+tanh-lab/ci-actions. Pin a tag (`@v0.1.2`), not `main`.
 
 ## Actions
 
@@ -27,12 +27,12 @@ jobs:
           - { name: Windows-x86_64, os: windows-2022 }
     steps:
       - uses: actions/checkout@v4
-      - uses: plugin-circuit/ci-actions/setup-build-tools@v0.1.1
-      - uses: plugin-circuit/ci-actions/cache-deps@v0.1.1
-      - uses: plugin-circuit/ci-actions/cmake-build@v0.1.1
+      - uses: plugin-circuit/ci-actions/setup-build-tools@v0.1.2
+      - uses: plugin-circuit/ci-actions/cache-deps@v0.1.2
+      - uses: plugin-circuit/ci-actions/cmake-build@v0.1.2
         with:
           BUILD_TYPE: RelWithDebInfo
-      - uses: plugin-circuit/ci-actions/cmake-test@v0.1.1
+      - uses: plugin-circuit/ci-actions/cmake-test@v0.1.2
         with:
           EXCLUDE_LABELS: gui
 ```

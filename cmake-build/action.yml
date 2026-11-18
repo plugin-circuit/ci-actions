@@ -48,9 +48,9 @@ runs:
           ARCH=""
           if [[ "${{ matrix.name }}" == macOS-x86_64* ]]; then ARCH="-DCMAKE_OSX_ARCHITECTURES=x86_64"; fi
           if [[ "${{ matrix.name }}" == macOS-arm64* ]]; then ARCH="-DCMAKE_OSX_ARCHITECTURES=arm64"; fi
-          # Windows: MSVC (cl) from the environment setup-build-tools prepared
           COMPILER=""
-          if [[ "${{ matrix.name }}" == Windows* ]]; then COMPILER="-DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl"; fi
+          # Windows: MSVC (cl), with debug info embedded in each object (/Z7): sccache can't share a .pdb (/Zi)
+          if [[ "${{ matrix.name }}" == Windows* ]]; then COMPILER="-DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded -DCMAKE_POLICY_DEFAULT_CMP0141=NEW"; fi
           cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ inputs.BUILD_TYPE }} $LAUNCHER $ARCH $COMPILER ${{ inputs.CMAKE_BUILD_ARGS }}
         fi
 
