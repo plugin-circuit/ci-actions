@@ -19,6 +19,10 @@ inputs:
   TARGETS:
     required: false
     description: "Space-separated list of targets to build (default: all)"
+  KEEP_GOING:
+    required: false
+    default: "false"
+    description: "Keep building after a failure (Ninja -k 0), so one run reports every compile error"
 
 runs:
   using: "composite"
@@ -55,6 +59,7 @@ runs:
       run: |
         TARGET_ARGS=""
         for target in ${{ inputs.TARGETS }}; do TARGET_ARGS="$TARGET_ARGS --target $target"; done
+        if [[ "${{ inputs.KEEP_GOING }}" == "true" ]]; then TARGET_ARGS="$TARGET_ARGS -- -k 0"; fi
         if [ -n "${{ inputs.PRESET }}" ]; then
           cmake --build --preset ${{ inputs.PRESET }} --parallel ${{ inputs.CMAKE_BUILD_PARALLEL_LEVEL }} $TARGET_ARGS
         else
