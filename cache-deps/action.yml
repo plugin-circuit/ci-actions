@@ -1,0 +1,21 @@
+name: cache-deps
+description: "Cache CMake FetchContent sources (build/_deps/*-src) between runs, keyed on the CMake files that pin them"
+
+inputs:
+  BUILD_DIR:
+    required: false
+    default: "build"
+    description: "The CMake binary directory"
+  KEY_FILES:
+    required: false
+    default: "**/CMakeLists.txt"
+    description: "Files whose hash keys the cache (where GIT_TAGs and URLs are pinned)"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/cache@v4
+      with:
+        path: ${{ inputs.BUILD_DIR }}/_deps/*-src
+        key: deps-${{ matrix.name }}-${{ hashFiles(inputs.KEY_FILES) }}
+        restore-keys: deps-${{ matrix.name }}-

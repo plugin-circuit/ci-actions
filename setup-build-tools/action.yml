@@ -1,0 +1,44 @@
+name: setup-build-tools
+description: "Install the build tools for a Plugin Circuit C++ project: Ninja, sccache's prerequisites, and optionally LLVM with wasm-ld (the test WCLAPs)"
+
+inputs:
+  LLVM:
+    required: false
+    default: "false"
+    description: "Also install LLVM with the wasm32 target and wasm-ld (builds the test WCLAPs)"
+
+runs:
+  using: "composite"
+  steps:
+    - name: printout
+      shell: bash
+      run: |
+        echo "ref=${{ github.ref }}"
+        echo "matrix.name=${{ matrix.name }}"
+        echo "matrix.os=${{ matrix.os }}"
+        uname -a || true
+
+    - name: install
+      shell: bash
+      run: |
+        if [[ "${{ matrix.name }}" == Linux* ]]; then
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libcurl4-openssl-dev
+          if [[ "${{ inputs.LLVM }}" == "true" ]]; then sudo apt-get install -y clang lld; fi
+        elif [[ "${{ matrix.name }}" == macOS* ]]; then
+          brew install ninja
+          if [[ "${{ inputs.LLVM }}" == "true" ]]; then brew install llvm lld; fi
+        elif [[ "${{ matrix.name }}" == Windows* ]]; then
+          choco install -y ninja
+          if [[ "${{ inputs.LLVM }}" == "true" ]]; then choco install -y llvm; fi
+        else
+          echo "Unknown platform: ${{ matrix.name }} (expected Linux*, macOS*, Windows*)"
+          exit 1
+        fi
+
+    # MSVC's environment for Ninja (sccache needs a Ninja/Makefile generator, not Visual Studio's)
+    - name: msvc environment
+      if: startsWith(matrix.name, 'Windows')
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ contains(matrix.name, 'arm64') && 'arm64' || 'x64' }}

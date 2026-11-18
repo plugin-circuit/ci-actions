@@ -1,0 +1,24 @@
+name: cmake-test
+description: "Run CTest (preset or manual mode), optionally excluding labels (e.g. tests that need a GUI session)"
+
+inputs:
+  PRESET:
+    required: false
+    description: "CMake test preset name. If set, uses ctest --preset. Otherwise ctest --test-dir build."
+  EXCLUDE_LABELS:
+    required: false
+    description: "A CTest label regex to exclude (ctest -LE), e.g. 'gui'"
+
+runs:
+  using: "composite"
+  steps:
+    - name: ctest
+      shell: bash
+      run: |
+        EXCLUDE=""
+        if [ -n "${{ inputs.EXCLUDE_LABELS }}" ]; then EXCLUDE="-LE ${{ inputs.EXCLUDE_LABELS }}"; fi
+        if [ -n "${{ inputs.PRESET }}" ]; then
+          ctest --preset ${{ inputs.PRESET }} --output-on-failure $EXCLUDE
+        else
+          ctest --test-dir build --output-on-failure $EXCLUDE
+        fi
